@@ -194,35 +194,14 @@ func (e *EncodeSession) run() {
 		e.options = StdEncodeOptions
 	}
 
-	vbrStr := "on"
-	if !e.options.VBR {
-		vbrStr = "off"
-	}
-
-	// Launch ffmpeg with a variety of different fruits and goodies mixed togheter
 	args := []string{
-		"-stats",
 		"-i", inFile,
-		"-reconnect", "1",
-		"-reconnect_at_eof", "1",
-		"-reconnect_streamed", "1",
-		"-reconnect_delay_max", "2",
-		"-map", "0:a",
-		"-acodec", "libopus",
+		"-vn",
+		"-c:a", "libopus",
 		"-f", "ogg",
-		"-vbr", vbrStr,
-		"-compression_level", strconv.Itoa(e.options.CompressionLevel),
-		"-vol", strconv.Itoa(e.options.Volume),
-		"-ar", strconv.Itoa(e.options.FrameRate),
-		"-ac", strconv.Itoa(e.options.Channels),
-		"-b:a", strconv.Itoa(e.options.Bitrate * 1000),
-		"-application", string(e.options.Application),
-		"-frame_duration", strconv.Itoa(e.options.FrameDuration),
-		"-packet_loss", strconv.Itoa(e.options.PacketLoss),
-		"-threads", strconv.Itoa(e.options.Threads),
-		"-ss", strconv.Itoa(e.options.StartTime),
 	}
 
+	println("setting args")
 	if e.options.AudioFilter != "" {
 		// Lit af
 		args = append(args, "-af", e.options.AudioFilter)
