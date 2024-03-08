@@ -201,7 +201,6 @@ func (e *EncodeSession) run() {
 		"-f", "ogg",
 	}
 
-	println("setting args")
 	if e.options.AudioFilter != "" {
 		// Lit af
 		args = append(args, "-af", e.options.AudioFilter)
