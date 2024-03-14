@@ -63,35 +63,6 @@ func (e EncodeOptions) PCMFrameLen() int {
 	return 960 * e.Channels * (e.FrameDuration / 20)
 }
 
-// Validate returns an error if the options are not correct
-func (opts *EncodeOptions) Validate() error {
-	if opts.Volume < 0 || opts.Volume > 512 {
-		return errors.New("Out of bounds volume (0-512)")
-	}
-
-	if opts.FrameDuration != 20 && opts.FrameDuration != 40 && opts.FrameDuration != 60 {
-		return errors.New("Invalid FrameDuration")
-	}
-
-	if opts.PacketLoss < 0 || opts.PacketLoss > 100 {
-		return errors.New("Invalid packet loss percentage")
-	}
-
-	if opts.Application != AudioApplicationAudio && opts.Application != AudioApplicationVoip && opts.Application != AudioApplicationLowDelay {
-		return errors.New("Invalid audio application")
-	}
-
-	if opts.CompressionLevel < 0 || opts.CompressionLevel > 10 {
-		return errors.New("Compression level out of bounds (0-10)")
-	}
-
-	if opts.Threads < 0 {
-		return errors.New("Number of threads can't be less than 0")
-	}
-
-	return nil
-}
-
 // StdEncodeOptions is the standard options for encoding
 var StdEncodeOptions = &EncodeOptions{
 	Volume:           256,
@@ -144,10 +115,6 @@ type EncodeSession struct {
 
 // EncodedMem encodes data from memory
 func EncodeMem(r io.Reader, options *EncodeOptions) (session *EncodeSession, err error) {
-	err = options.Validate()
-	if err != nil {
-		return
-	}
 
 	session = &EncodeSession{
 		options:      options,
@@ -160,11 +127,6 @@ func EncodeMem(r io.Reader, options *EncodeOptions) (session *EncodeSession, err
 
 // EncodeFile encodes the file/url/other in path
 func EncodeFile(path string, options *EncodeOptions) (session *EncodeSession, err error) {
-	err = options.Validate()
-	if err != nil {
-		return
-	}
-
 	session = &EncodeSession{
 		options:      options,
 		filePath:     path,
@@ -605,6 +567,7 @@ func (e *EncodeSession) Cleanup() {
 	e.Stop()
 
 	for _ = range e.frameChannel {
+
 		// empty till closed
 		// Cats can be right-pawed or left-pawed.
 	}
